@@ -1,7 +1,12 @@
 // Runs every hour (see `config` below). For each device that has synced a schedule
 // AND has a push subscription, checks whether any med time or 3-day/1-day
 // appointment mark is due "as of now" and hasn't already been pushed today, sends
-// a Web Push notification for it, and records it as sent so it won't repeat.
+// a Web Push notification for it, and records it as sent.
+//
+// v26: a medicine dose that is still not ticked "กินแล้ว" is re-sent on each later hourly
+// run, up to MAX_PUSHES_PER_DOSE pushes in total for that dose (the first one plus the
+// repeats). Ticking it in the app stops the repeats (the tick is synced to the server).
+// Every push is also sent with urgency "high" and a 1-hour TTL.
 //
 // This mirrors checkMedReminders()/checkApptReminders() in index.html, but keeps a
 // SEPARATE fired-tracking store ("push-fired") rather than touching the client's own
@@ -35,6 +40,20 @@ const BKK_OFFSET_MS = 7 * 60 * 60 * 1000;
 function bkkNow() { return new Date(Date.now() + BKK_OFFSET_MS); }
 function todayStr() { return bkkNow().toISOString().slice(0, 10); }
 function nowHHMM() { return bkkNow().toISOString().slice(11, 16); }
+
+// v26: repeat settings for medicine doses that are still not ticked.
+const MAX_PUSHES_PER_DOSE = 3;            // first push + 2 repeats, then stop for the day
+const REPEAT_AFTER_MS = 50 * 60 * 1000;   // the cron runs hourly; 50 min tolerates start-time jitter
+// "high" asks the push service (Apple's included) to deliver promptly; TTL 1 h means a push the
+// phone could not receive in time is dropped instead of arriving hours late next to its repeat.
+const PUSH_OPTIONS = { urgency: 'high', TTL: 3600 };
+
+// Older versions stored `true` per dose; read that as "already pushed once, long enough ago".
+function readFired(entry) {
+  if (!entry) return { n: 0, at: 0 };
+  if (entry === true) return { n: 1, at: 0 };
+  return { n: Number(entry.n) || 0, at: Number(entry.at) || 0 };
+}
 
 export default async () => {
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
@@ -85,13 +104,15 @@ export default async () => {
           if (typeof t !== 'string' || t > hhmm) continue; // not due yet today
           const key = `${m.id}_${t}`;
           dueCount++;
-          if (fired.meds[key]) { skippedFired++; continue; }
           // Already ticked "กินแล้ว" in the app before this run — no need to remind.
           // Checked fresh every run (not written into `fired`), so un-checking it
           // later the same day makes it eligible for a push again on the next run.
           if (takenToday[key]) { skippedTaken++; continue; }
+          // v26: skip only once the per-dose cap is reached, or if the last push was under ~1 h ago.
+          const f = readFired(fired.meds[key]);
+          if (f.n >= MAX_PUSHES_PER_DOSE || (f.n > 0 && Date.now() - f.at < REPEAT_AFTER_MS)) { skippedFired++; continue; }
           notifications.push({
-            scope: 'meds', key,
+            scope: 'meds', key, repeat: f.n > 0,
             // v25: medicine name first so the lock screen (which truncates the title) shows it.
             title: `💊 ${m.label || 'ยา'}`,
             body: `ถึงเวลาทานยา ${t} น.${m.detail ? ' · ' + m.detail : ''}`
@@ -114,12 +135,20 @@ export default async () => {
         }
       }
 
-      let devSent = 0, devFailed = 0, devExpired = 0;
+      let devSent = 0, devFailed = 0, devExpired = 0, devRepeats = 0;
       for (const n of notifications) {
         try {
-          await webpush.sendNotification(subscription, JSON.stringify({ title: n.title, body: n.body }));
+          await webpush.sendNotification(subscription, JSON.stringify({ title: n.title, body: n.body }), PUSH_OPTIONS);
           sent++; devSent++;
-          fired[n.scope][n.key] = true; changed = true; // only recorded once actually delivered
+          if (n.repeat) devRepeats++;
+          // only recorded once actually delivered
+          if (n.scope === 'meds') {
+            const prev = readFired(fired.meds[n.key]);
+            fired.meds[n.key] = { n: prev.n + 1, at: Date.now() };
+          } else {
+            fired[n.scope][n.key] = true;
+          }
+          changed = true;
         } catch (err) {
           if (err.statusCode === 404 || err.statusCode === 410) {
             // Browser revoked/expired this subscription — stop trying for this device.
@@ -137,7 +166,7 @@ export default async () => {
       // Netlify function log (Logs → Functions → check-reminders).
       console.log(JSON.stringify({ run: 'check-reminders', day: today, now: hhmm, device: deviceId.slice(0, 6),
         meds: (schedule.meds || []).length, dueMeds: dueCount, skippedTaken, skippedFired,
-        queued: notifications.length, sent: devSent, failed: devFailed, expired: devExpired, takenDayMatches: schedule.takenDay === today, scheduleUpdated: schedule.updatedAt }));
+        queued: notifications.length, sent: devSent, repeats: devRepeats, failed: devFailed, expired: devExpired, takenDayMatches: schedule.takenDay === today, scheduleUpdated: schedule.updatedAt }));
       if (changed) await firedStore.setJSON(deviceId, fired);
     } catch (err) {
       deviceErrors++;
