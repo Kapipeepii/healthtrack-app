@@ -8,6 +8,9 @@
 // repeats). Ticking it in the app stops the repeats (the tick is synced to the server).
 // Every push is also sent with urgency "high" and a 1-hour TTL.
 //
+// v27: the push text is short — time (meal tag), dose with tablet count, pill appearance —
+// built from fields the app syncs (dose / look / tags). Notes and warnings are not sent.
+//
 // This mirrors checkMedReminders()/checkApptReminders() in index.html, but keeps a
 // SEPARATE fired-tracking store ("push-fired") rather than touching the client's own
 // `fired`/`reminded` state — the client only ever checks those while the app is open,
@@ -115,7 +118,11 @@ export default async () => {
             scope: 'meds', key, repeat: f.n > 0,
             // v25: medicine name first so the lock screen (which truncates the title) shows it.
             title: `💊 ${m.label || 'ยา'}`,
-            body: `ถึงเวลาทานยา ${t} น.${m.detail ? ' · ' + m.detail : ''}`
+            // v27: short body "05:30 น. (ก่อนอาหาร) · 500 mg (1 เม็ด) · กลม · เล็ก · ขาว". A schedule
+            // synced by an older app version (no m.v) keeps the old text until the app syncs again.
+            body: (m.v >= 2)
+              ? [`${t} น.${(m.tags && m.tags[t]) ? ` (${m.tags[t]})` : ''}`, m.dose, m.look].filter(Boolean).join(' · ')
+              : `ถึงเวลาทานยา ${t} น.${m.detail ? ' · ' + m.detail : ''}`
           });
         }
       }
