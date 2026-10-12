@@ -160,6 +160,32 @@
     animation:celebrateParticle .9s cubic-bezier(.2,.7,.3,1) forwards;
   }
   @media (prefers-reduced-motion: reduce){ .celebrate-particle{ display:none; } }
+  .mg-group{ border:1px solid #e6efe9; border-radius:14px; overflow:hidden; background:#fff; margin-bottom:8px; }
+  .mg-head{ display:flex; align-items:center; gap:6px; width:100%; padding:9px 12px; background:var(--primary-light); border:0; text-align:left; cursor:pointer; font-size:calc(0.8125rem * var(--ts,1)); color:var(--ink); }
+  .mg-time{ font-weight:700; }
+  .mg-spacer{ flex:1; }
+  .mg-count{ font-size:calc(0.75rem * var(--ts,1)); font-weight:600; color:var(--ink-soft); background:#fff; border-radius:999px; padding:1px 9px; }
+  .mg-count-done{ color:var(--primary-dark); background:#d7eddf; }
+  .mg-chev{ transition:transform .15s; font-size:calc(0.75rem * var(--ts,1)); color:var(--ink-soft); }
+  .mg-chev.closed{ transform:rotate(-90deg); }
+  .mg-row{ display:flex; align-items:flex-start; gap:12px; padding:10px 12px; border-top:1px solid #eef3ef; cursor:pointer; }
+  .mg-row input[type=checkbox]{ flex:none; width:22px; height:22px; margin-top:2px; accent-color:var(--primary); }
+  .mg-row.on .mg-name{ color:var(--ink-soft); text-decoration:line-through; }
+  .mg-info{ min-width:0; }
+  .mg-name{ font-size:calc(0.875rem * var(--ts,1)); font-weight:600; color:var(--ink); line-height:1.35; }
+  .mg-dose{ font-size:calc(0.75rem * var(--ts,1)); color:var(--ink-soft); line-height:1.4; }
+  .mg-look{ display:inline-flex; align-items:center; gap:5px; margin-top:3px; font-size:calc(0.6875rem * var(--ts,1)); color:var(--ink-soft); background:#f4f7f5; border:1px solid #e3ebe6; border-radius:999px; padding:1px 8px 1px 6px; }
+  .mg-dot{ width:10px; height:10px; border-radius:50%; border:1px solid rgba(0,0,0,.18); flex:none; display:inline-block; }
+  .mg-tag{ font-size:calc(0.6875rem * var(--ts,1)); font-weight:600; border-radius:999px; padding:1px 9px; margin-left:4px; white-space:nowrap; }
+  .mg-tag-before{ background:#fdf0d5; color:#8a5a00; }
+  .mg-tag-after{ background:#e3f0fb; color:#1f5f99; }
+  .mg-tag-with{ background:#e4f4e8; color:#2f6b4d; }
+  .mg-tag-bed{ background:#ece8f9; color:#4b3a99; }
+  .mg-tag-other{ background:#eeeeee; color:#555555; }
+  .mg-timechip{ display:inline-flex; align-items:center; gap:2px; font-size:calc(0.625rem * var(--ts,1)); padding:1px 6px; border-radius:999px; background:var(--accent-light); color:var(--accent-dark); font-weight:500; }
+  .mg-timechip .mg-tag{ margin-left:3px; padding:0 6px; }
+  .mg-pick{ font-size:calc(0.75rem * var(--ts,1)); border:1px solid #d9e3dd; background:#fff; border-radius:999px; padding:4px 10px; display:inline-flex; align-items:center; gap:5px; color:var(--ink); cursor:pointer; }
+  .mg-pick.on{ background:var(--primary-light); border-color:var(--primary); color:var(--primary-dark); font-weight:600; }
 </style>
 </head>
 <body class="min-h-screen pb-24 md:pb-8">
@@ -580,23 +606,15 @@
           <input id="m_name" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--accent)]"></div>
         <div><label class="text-xs font-medium text-[var(--ink-soft)]">ชื่อเล่น <span class="text-slate-400 font-normal">(ถ้ามี)</span></label>
           <input id="m_nickname" placeholder="เช่น ยาเบาหวาน, ยาความดัน" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--accent)]"></div>
-        <div><label class="text-xs font-medium text-[var(--ink-soft)]">ปริมาณ / โดส</label>
-          <input id="m_dosage" placeholder="เช่น 500 mg (1 เม็ด)" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--accent)]"></div>
+        <div><label class="text-xs font-medium text-[var(--ink-soft)]">ปริมาณ / โดส <span class="text-slate-400 font-normal">(ขนาดยาต่อเม็ด จำนวนเม็ดใส่ช่อง "กินครั้งละ")</span></label>
+          <input id="m_dosage" placeholder="เช่น 500 mg" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--accent)]"></div>
         <div><label class="text-xs font-medium text-[var(--ink-soft)]">วันที่เริ่มทาน</label>
           <input type="date" id="m_startdate" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--accent)]"></div>
         <div><label class="text-xs font-medium text-[var(--ink-soft)]">จำนวนที่ได้รับ <span class="text-slate-400 font-normal">(เม็ด)</span></label>
           <input type="number" min="0" id="m_quantity" placeholder="เช่น 30" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--accent)]"></div>
         <div><label class="text-xs font-medium text-[var(--ink-soft)]">กินครั้งละ <span class="text-slate-400 font-normal">(เม็ด)</span></label>
-          <input type="number" min="0" step="0.5" id="m_pillsperdose" placeholder="เช่น 1" value="1" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--accent)]"></div>
-        <div><label class="text-xs font-medium text-[var(--ink-soft)]">ก่อน/หลังอาหาร</label>
-          <select id="m_timing" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--accent)] bg-white">
-            <option value="">ไม่ระบุ</option>
-            <option value="ก่อนอาหาร">ก่อนอาหาร</option>
-            <option value="หลังอาหาร">หลังอาหาร</option>
-            <option value="พร้อมอาหาร">พร้อมอาหาร</option>
-            <option value="ก่อนนอน">ก่อนนอน</option>
-          </select></div>
-        <div class="md:col-span-2">
+          <input type="number" min="0" step="0.5" id="m_pillsperdose" placeholder="เช่น 1" value="1" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-[var(--accent)]"><div class="flex flex-wrap gap-1.5 mt-1.5" id="m_pillQuick"><button type="button" class="mg-pick" data-v="0.5">½ เม็ด</button><button type="button" class="mg-pick" data-v="1">1 เม็ด</button><button type="button" class="mg-pick" data-v="1.5">1½ เม็ด</button><button type="button" class="mg-pick" data-v="2">2 เม็ด</button></div></div>
+                <div class="md:col-span-2">
           <label class="text-xs font-medium text-[var(--ink-soft)] mb-1 block">เวลาทาน</label>
           <div class="flex flex-wrap gap-3" id="m_timeChipsRow">
             <label class="flex items-center gap-2 bg-[var(--accent-light)] border border-[var(--accent-light)] rounded-full px-3 py-1.5 text-sm cursor-pointer"><input type="checkbox" class="m_time" value="08:00" checked> เช้า 08:00</label>
@@ -607,6 +625,29 @@
           <div class="flex items-center gap-2 mt-2">
             <input type="time" id="m_customTimeInput" class="rounded-lg border border-slate-200 px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]">
             <button type="button" id="m_addCustomTimeBtn" class="text-xs px-3 py-1.5 rounded-full bg-[var(--accent)] text-white font-semibold hover:opacity-90">+ เพิ่มเวลาเอง</button>
+          </div>
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-xs font-medium text-[var(--ink-soft)] mb-1 block">ก่อน/หลังอาหาร ของแต่ละเวลา <span class="text-slate-400 font-normal">(ไม่บังคับ — ใช้ช่วยจำเท่านั้น)</span></label>
+          <div id="m_timingRows" class="space-y-2"></div>
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-xs font-medium text-[var(--ink-soft)] mb-1 block">ลักษณะเม็ดยา <span class="text-slate-400 font-normal">(ไม่บังคับ กรอกทีหลังได้)</span></label>
+          <p class="text-xs text-[var(--ink-soft)] mb-1">รูปร่าง</p>
+          <div id="m_lookShape" class="flex flex-wrap gap-1.5 mb-2"></div>
+          <p class="text-xs text-[var(--ink-soft)] mb-1">ขนาด</p>
+          <div id="m_lookSize" class="flex flex-wrap gap-1.5 mb-2"></div>
+          <p class="text-xs text-[var(--ink-soft)] mb-1">สี (เลือกได้ไม่เกิน 2 สี)</p>
+          <div id="m_lookColor" class="flex flex-wrap gap-1.5 mb-2"></div>
+          <p class="text-xs text-[var(--ink-soft)] mb-1">รอยบนเม็ด</p>
+          <div class="flex flex-wrap gap-2">
+            <select id="m_lookMark" class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)] bg-white">
+              <option value="">ไม่ระบุ</option>
+              <option value="ไม่มี">ไม่มี</option>
+              <option value="มีขีดแบ่ง">มีขีดแบ่ง</option>
+              <option value="มีตัวอักษร/ตัวเลข">มีตัวอักษร/ตัวเลข</option>
+            </select>
+            <input id="m_lookMarkText" maxlength="30" placeholder="ข้อความที่ปั๊ม เช่น 500" class="flex-1 min-w-[8rem] rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]">
           </div>
         </div>
         <div class="md:col-span-2"><label class="text-xs font-medium text-[var(--ink-soft)]">หมายเหตุ / คำเตือน</label>
@@ -639,6 +680,7 @@
   <div id="medListCard" class="home-section-card">
     <h2 class="font-bold text-[var(--ink)] mb-1 flex items-center gap-2">📋 รายการยาทั้งหมด</h2>
     <p class="text-xs text-[var(--ink-soft)] mb-3">คอลัมน์ "ยาหมดวันที่" คำนวณจาก จำนวนที่ได้รับ ÷ (กินครั้งละกี่เม็ด × จำนวนครั้งต่อวัน) — ใช้เป็นตัวช่วยประมาณการเท่านั้น</p>
+    <div id="medLookFilter" class="mb-3"></div>
     <div class="overflow-x-auto data-table-wrap">
       <table class="data-table text-sm">
         <thead><tr>
@@ -1178,13 +1220,14 @@ function urlBase64ToUint8Array(base64String){
 // reporting a bug. Keep this in sync with the CACHE_NAME comment in sw.js — this list
 // only starts at v17 because earlier versions weren't tracked in-app; no need to
 // backfill those.
-const APP_VERSION = 'v26';
+const APP_VERSION = 'v27';
 // Stamped automatically at deploy time by scripts/stamp-version.mjs (the Netlify
 // build command replaces the placeholder below with the real build date) — fixes
 // the earlier bug where this was typed by hand and quietly went stale.
 const APP_VERSION_DATE = '__BUILD_DATE__';
 const VERSION_HISTORY = [
-  { v: 'v26', date: '__BUILD_DATE__', desc: 'Push เตือนยาซ้ำทุกชั่วโมงจนกว่าจะติ๊ก "กินแล้ว" (สูงสุด 3 ครั้งต่อมื้อ) และส่งแบบความเร่งด่วนสูง (urgency high) ให้ iOS แสดงแบนเนอร์ตรงเวลาขึ้น — ยังแยกแจ้งเตือนทีละยาเหมือนเดิม' },
+  { v: 'v27', date: '__BUILD_DATE__', desc: 'หน้าแรกจัดยาเป็นกลุ่มตามเวลา (ก่อนอาหาร/หลังอาหาร/พร้อมอาหาร/ก่อนนอน ตั้งต่อเวลา) พร้อมนับ x/y ทุกกลุ่ม, ใส่ลักษณะเม็ดยา (รูปร่าง ขนาด สี รอยบนเม็ด) และกรองในแท็บยา, ตัวเลือกครึ่งเม็ด (½/1½), ข้อความแจ้งเตือนสั้นลง: เวลา (ก่อน/หลังอาหาร) · ขนาดยา (จำนวนเม็ด) · ลักษณะเม็ด' },
+  { v: 'v26', date: '2026-10-12', desc: 'Push เตือนยาซ้ำทุกชั่วโมงจนกว่าจะติ๊ก "กินแล้ว" (สูงสุด 3 ครั้งต่อมื้อ) และส่งแบบความเร่งด่วนสูง (urgency high) ให้ iOS แสดงแบนเนอร์ตรงเวลาขึ้น — ยังแยกแจ้งเตือนทีละยาเหมือนเดิม' },
   { v: 'v25', date: '2026-10-08', desc: 'แจ้งเตือนยาแสดงชื่อยาขึ้นหน้าและเวลามื้อ, หัวแอปไม่ชนแถบสถานะ iPhone, เตือนสำรองข้อมูลทุก 30 วัน, log ฝั่งเซิร์ฟเวอร์นับส่งสำเร็จ/ล้มเหลว' },
   { v: 'v24', date: '2026-10-07', desc: 'ตั้งชื่อแอปเองได้ (แท็บ ข้อมูล) และแยกคีย์ Push ต่อเว็บไซต์ (แอปดึง public key จากเซิร์ฟเวอร์แทนการฝังในโค้ด) เพื่อให้แต่ละคนติดตั้งเว็บของตัวเองได้ + จัดหน้าแท็บ ข้อมูล ใหม่ ลบข้อความเก่าที่ล้าสมัย + แก้บั๊กหน้าแรกไม่แสดงช่องติ๊กยาของเวลาที่กำหนดเอง (เช่น 06:00) + แก้ชื่อเวลาซ้ำในแท็บยา + กัน "กินแล้ว" ของเมื่อวานมาบล็อก Push ของวันนี้ และซิงก์ตารางไปเซิร์ฟเวอร์ทุกครั้งที่เปิดแอป' },
   { v: 'v23', date: '2026-10-06', desc: 'เพิ่มเวลาทานยาแบบกำหนดเอง (นอกจาก 4 ช่วงเดิม เช่น 06:00 แทน 08:00) และ Push จะข้ามการแจ้งเตือนอัตโนมัติถ้าติ๊ก "กินแล้ว" ไว้ก่อนถึงเวลาแล้ว (ถ้าเอาติ๊กออกภายหลัง จะกลับมาแจ้งเตือนได้ตามปกติ) และแก้บั๊ก check-reminders: เดิมถ้าส่ง Push ครั้งแรกไม่สำเร็จ ระบบจะจำผิดว่าส่งแล้วและไม่ลองซ้ำอีกเลยทั้งวัน ตอนนี้จะลองใหม่ทุกชั่วโมงจนกว่าจะส่งสำเร็จจริง' },
@@ -2691,7 +2734,87 @@ $('aiInsightBtn').addEventListener('click', async () => {
   }
 });
 
-const TIME_SLOT_SHORT = { '08:00':'เช้า', '12:00':'กลางวัน', '18:00':'เย็น', '21:00':'ก่อนนอน' };
+/* v27: dose-time grouping, meal-relation tags and pill appearance.
+   Data on each medicine (all optional, older saved data keeps working):
+   - timingByTime: { 'HH:MM': 'ก่อนอาหาร' | ... | '-' }  ('-' = explicitly none)
+   - timing: legacy single value for every time of that medicine
+   - look: { shape, size, colors[], mark, markText }
+   - pillsPerDose: 0.5 steps, shown as ½ / 1½ */
+const MEAL_TAGS = ['ก่อนอาหาร', 'หลังอาหาร', 'พร้อมอาหาร', 'ก่อนนอน'];
+const MEAL_TAG_CLASS = { 'ก่อนอาหาร':'mg-tag-before', 'หลังอาหาร':'mg-tag-after', 'พร้อมอาหาร':'mg-tag-with', 'ก่อนนอน':'mg-tag-bed' };
+const LOOK_SHAPES = ['กลม', 'รี', 'แคปซูล', 'เหลี่ยม', 'อื่นๆ'];
+const LOOK_SIZES = ['เล็ก', 'กลาง', 'ใหญ่'];
+const LOOK_COLORS = { 'ขาว':'#ffffff', 'เหลือง':'#f3d34a', 'ส้ม':'#f0a050', 'ชมพู':'#f0a6c0', 'แดง':'#d9534f', 'น้ำตาล':'#9a6b43', 'เขียว':'#6cb86c', 'ฟ้า':'#7bb6e8', 'ม่วง':'#a58ad6', 'เทา':'#b5b5b5' };
+
+function mealTagFor(m, t){
+  const o = m.timingByTime && m.timingByTime[t];
+  if (o === '-') return '';
+  if (o) return String(o);
+  if (m.timing) return String(m.timing);
+  return t === '21:00' ? 'ก่อนนอน' : '';
+}
+function mealOrder(tag){ return MEAL_TAGS.indexOf(tag); }
+function mealTagHtml(tag){
+  if (!tag) return '';
+  return `<span class="mg-tag ${MEAL_TAG_CLASS[tag] || 'mg-tag-other'}">${escapeHtml(tag)}</span>`;
+}
+function medTagsByTime(m){
+  const o = {};
+  (m.times || []).forEach(t => { const g = mealTagFor(m, t); if (g) o[t] = g; });
+  return o;
+}
+function fmtPills(n){
+  n = Number(n);
+  if (!isFinite(n) || n <= 0) n = 1;
+  const w = Math.floor(n), f = n - w;
+  if (Math.abs(f - 0.5) < 1e-9) return (w ? String(w) : '') + '½';
+  return String(Math.round(n * 100) / 100);
+}
+// "500 mg (1 เม็ด)". If the dosage text already mentions a pill count it is used as typed.
+function medDoseLabel(m){
+  const d = String(m.dosage || '').trim();
+  if (/เม็ด|แคปซูล|tab|cap/i.test(d)) return d;
+  const pills = fmtPills(m.pillsPerDose);
+  return d ? `${d} (${pills} เม็ด)` : `${pills} เม็ด`;
+}
+function lookOf(m){
+  const l = m && m.look;
+  if (!l || typeof l !== 'object') return null;
+  return {
+    shape: String(l.shape || ''), size: String(l.size || ''),
+    colors: Array.isArray(l.colors) ? l.colors.map(String).slice(0, 2) : [],
+    mark: String(l.mark || ''), markText: String(l.markText || '')
+  };
+}
+function medLookLabel(m){
+  const l = lookOf(m);
+  if (!l) return '';
+  return [l.shape, l.size, l.colors.join('/')].filter(Boolean).join(' · ');
+}
+function medMarkLabel(m){
+  const l = lookOf(m);
+  if (!l) return '';
+  const parts = [];
+  if (l.mark && l.mark !== 'ไม่มี') parts.push(l.mark);
+  if (l.markText) parts.push('"' + l.markText + '"');
+  return parts.join(' ');
+}
+function medLookHtml(m, withMark){
+  const lab = medLookLabel(m);
+  const mk = withMark ? medMarkLabel(m) : '';
+  if (!lab && !mk) return '';
+  const l = lookOf(m);
+  const dots = l.colors.map(c => LOOK_COLORS[c] ? `<span class="mg-dot" style="background:${LOOK_COLORS[c]}"></span>` : '').join('');
+  return `<span class="mg-look">${dots}${escapeHtml([lab, mk].filter(Boolean).join(' · '))}</span>`;
+}
+// Compact body shared by the push text and the in-app notification:
+// "05:30 น. (ก่อนอาหาร) · 500 mg (1 เม็ด) · กลม · เล็ก · ขาว"
+function medReminderBody(m, t){
+  const tag = mealTagFor(m, t);
+  return [`${t} น.${tag ? ` (${tag})` : ''}`, medDoseLabel(m), medLookLabel(m)].filter(Boolean).join(' · ');
+}
+
+const collapsedMedGroups = new Set();
 
 function renderTodayMedWidget(){
   const day = todayStr();
@@ -2700,37 +2823,36 @@ function renderTodayMedWidget(){
 
   if (!meds.length){ widget.innerHTML = '<p class="text-sm text-[var(--ink-soft)]">ยังไม่มีรายการยา</p>'; $('todayMedProgress').textContent='0/0'; return; }
 
-  // Show a column for EVERY time any medicine uses — the 4 presets and custom times
-  // (v23 added custom times but this table still only knew the 4 presets, so a dose at
-  // e.g. 06:00 had no checkbox here while still being counted in the x/y progress).
-  const activeSlots = [...new Set(meds.flatMap(m => m.times))].sort();
+  // v27: one group per dose time (plus its meal tag), each with its own taken/total count.
+  const map = new Map();
   let total = 0, done = 0;
-  meds.forEach(m => m.times.forEach(t => { total++; if (medTrack[day][m.id+'_'+t]) done++; }));
+  meds.forEach(m => (m.times || []).forEach(t => {
+    const tag = mealTagFor(m, t);
+    const gk = t + '|' + tag;
+    const key = m.id + '_' + t;
+    const checked = !!medTrack[day][key];
+    total++; if (checked) done++;
+    if (!map.has(gk)) map.set(gk, { gk, t, tag, items: [] });
+    map.get(gk).items.push({ m, key, checked });
+  }));
+  const groups = [...map.values()].sort((a, b) => a.t.localeCompare(b.t) || mealOrder(a.tag) - mealOrder(b.tag));
 
-  const table = document.createElement('table');
-  table.className = 'w-full text-xs border-separate border-spacing-y-1';
-  let html = `<thead><tr class="text-[var(--ink-soft)]"><th class="text-left font-medium pb-1">ยา</th>`;
-  activeSlots.forEach(t => html += `<th class="font-medium pb-1 num">${TIME_SLOT_SHORT[t] || '⏰'}<br><span class="text-[calc(0.5625rem_*_var(--ts,1))] opacity-70">${t}</span></th>`);
-  html += `</tr></thead><tbody>`;
-  meds.forEach(m => {
-    html += `<tr class="bg-slate-50"><td class="py-1.5 px-2 rounded-l-lg font-medium text-[var(--ink)] truncate max-w-[calc(110px*var(--ts,1))]">${medDisplayName(m)}</td>`;
-    activeSlots.forEach((t, i) => {
-      const isLast = i === activeSlots.length - 1;
-      if (!m.times.includes(t)){ html += `<td class="text-center text-slate-300 ${isLast?'rounded-r-lg':''}">—</td>`; return; }
-      const key = m.id + '_' + t;
-      const checked = !!medTrack[day][key];
-      html += `<td class="text-center ${isLast?'rounded-r-lg':''}"><input type="checkbox" class="home-med-check" data-key="${key}" ${checked?'checked':''}></td>`;
-    });
-    html += `</tr>`;
-  });
-  html += `</tbody>`;
-  table.innerHTML = html;
-  widget.innerHTML = '';
-  const scrollWrap = document.createElement('div');
-  scrollWrap.className = 'overflow-x-auto -mx-1 px-1';
-  scrollWrap.appendChild(table);
-  widget.appendChild(scrollWrap);
+  widget.innerHTML = groups.map(g => {
+    const gDone = g.items.filter(i => i.checked).length;
+    const closed = collapsedMedGroups.has(g.gk);
+    const rows = g.items.map(i => `<label class="mg-row ${i.checked ? 'on' : ''}"><input type="checkbox" class="home-med-check" data-key="${i.key}" ${i.checked ? 'checked' : ''}><div class="mg-info"><div class="mg-name">${medDisplayName(i.m)}</div><div class="mg-dose">${escapeHtml(medDoseLabel(i.m))}</div>${medLookHtml(i.m, true)}</div></label>`).join('');
+    return `<div class="mg-group"><button type="button" class="mg-head" data-gk="${escapeHtml(g.gk)}" aria-expanded="${!closed}"><span class="mg-time num">${escapeHtml(g.t)} น.</span>${mealTagHtml(g.tag)}<span class="mg-spacer"></span><span class="mg-count num ${gDone === g.items.length ? 'mg-count-done' : ''}">${gDone}/${g.items.length}</span><span class="mg-chev ${closed ? 'closed' : ''}" aria-hidden="true">▾</span></button><div class="mg-body" ${closed ? 'hidden' : ''}>${rows}</div></div>`;
+  }).join('');
   $('todayMedProgress').textContent = `${done}/${total}`;
+
+  widget.querySelectorAll('.mg-head').forEach(h => h.addEventListener('click', () => {
+    const gk = h.dataset.gk;
+    const nowClosed = !collapsedMedGroups.has(gk);
+    if (nowClosed) collapsedMedGroups.add(gk); else collapsedMedGroups.delete(gk);
+    h.nextElementSibling.hidden = nowClosed;
+    h.setAttribute('aria-expanded', String(!nowClosed));
+    h.querySelector('.mg-chev').classList.toggle('closed', nowClosed);
+  }));
 
   widget.querySelectorAll('.home-med-check').forEach(cb => {
     cb.addEventListener('change', () => {
@@ -4028,6 +4150,60 @@ let editingMedId = null; // null = "add" mode; a med id = "edit" mode
 const MED_PRESET_TIMES = ['08:00', '12:00', '18:00', '21:00'];
 let customMedTimes = [];
 
+function selectedMedTimes(){
+  return [...new Set([...document.querySelectorAll('.m_time:checked')].map(c => c.value).concat(customMedTimes))].sort();
+}
+
+// v27: meal tag per dose time, and pill appearance, are edited as drafts and written on save.
+let timingDraft = {};
+let lookDraft = { shape: '', size: '', colors: [] };
+
+function timingRowValue(t){
+  return Object.prototype.hasOwnProperty.call(timingDraft, t) ? timingDraft[t] : (t === '21:00' ? 'ก่อนนอน' : '');
+}
+function renderTimingRows(){
+  const box = $('m_timingRows');
+  const times = selectedMedTimes();
+  if (!times.length){ box.innerHTML = '<p class="text-xs text-[var(--ink-soft)]">เลือกเวลาทานก่อน</p>'; return; }
+  box.innerHTML = times.map(t => {
+    const v = timingRowValue(t);
+    const extra = (v && !MEAL_TAGS.includes(v)) ? `<option value="${escapeHtml(v)}" selected>${escapeHtml(v)}</option>` : '';
+    return `<div class="flex items-center gap-2"><span class="num text-sm w-16 shrink-0">${escapeHtml(t)} น.</span><select class="m_timingSel flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)] bg-white" data-t="${escapeHtml(t)}"><option value="">ไม่ระบุ</option>${MEAL_TAGS.map(g => `<option value="${g}" ${v === g ? 'selected' : ''}>${g}</option>`).join('')}${extra}</select></div>`;
+  }).join('');
+}
+$('m_timingRows').addEventListener('change', e => {
+  const sel = e.target.closest('.m_timingSel');
+  if (sel) timingDraft[sel.dataset.t] = sel.value;
+});
+$('m_timeChipsRow').addEventListener('change', e => {
+  if (e.target.classList && e.target.classList.contains('m_time')) renderTimingRows();
+});
+
+function renderLookChips(){
+  const chip = (label, on, attrs, dot) => `<button type="button" class="mg-pick ${on ? 'on' : ''}" ${attrs} aria-pressed="${on}">${dot ? `<span class="mg-dot" style="background:${dot}"></span>` : ''}${escapeHtml(label)}</button>`;
+  $('m_lookShape').innerHTML = LOOK_SHAPES.map(v => chip(v, lookDraft.shape === v, `data-k="shape" data-v="${v}"`)).join('');
+  $('m_lookSize').innerHTML = LOOK_SIZES.map(v => chip(v, lookDraft.size === v, `data-k="size" data-v="${v}"`)).join('');
+  $('m_lookColor').innerHTML = Object.keys(LOOK_COLORS).map(v => chip(v, lookDraft.colors.includes(v), `data-k="color" data-v="${v}"`, LOOK_COLORS[v])).join('');
+}
+['m_lookShape', 'm_lookSize', 'm_lookColor'].forEach(id => $(id).addEventListener('click', e => {
+  const b = e.target.closest('.mg-pick');
+  if (!b) return;
+  const k = b.dataset.k, v = b.dataset.v;
+  if (k === 'color'){
+    const i = lookDraft.colors.indexOf(v);
+    if (i >= 0) lookDraft.colors.splice(i, 1);
+    else if (lookDraft.colors.length >= 2){ showToast('เลือกได้ไม่เกิน 2 สี', 'กดสีที่เลือกไว้อีกครั้งเพื่อเอาออก', 'amber'); return; }
+    else lookDraft.colors.push(v);
+  } else {
+    lookDraft[k] = (lookDraft[k] === v) ? '' : v;
+  }
+  renderLookChips();
+}));
+$('m_pillQuick').addEventListener('click', e => {
+  const b = e.target.closest('.mg-pick');
+  if (b) $('m_pillsperdose').value = b.dataset.v;
+});
+
 function renderCustomMedTimeChips(){
   const row = $('m_timeChipsRow');
   row.querySelectorAll('.m_custom_time_chip').forEach(el => el.remove());
@@ -4044,6 +4220,7 @@ function renderCustomMedTimeChips(){
     chip.appendChild(rm);
     row.appendChild(chip);
   });
+  renderTimingRows();
 }
 $('m_addCustomTimeBtn').addEventListener('click', () => {
   const t = $('m_customTimeInput').value;
@@ -4059,6 +4236,9 @@ function resetMedForm(){
   $('medForm').reset();
   document.querySelectorAll('.m_time').forEach((c,i)=> c.checked = (i===0||i===2));
   customMedTimes = [];
+  timingDraft = {};
+  lookDraft = { shape: '', size: '', colors: [] };
+  renderLookChips();
   renderCustomMedTimeChips();
   $('medFormSubmitBtn').textContent = 'เพิ่มยานี้';
   $('medFormCancelBtn').classList.add('hidden');
@@ -4074,10 +4254,21 @@ function editMed(id){
   $('m_startdate').value = m.startDate || '';
   $('m_quantity').value = m.quantity ?? '';
   $('m_pillsperdose').value = m.pillsPerDose ?? 1;
-  $('m_timing').value = m.timing || '';
   $('m_notes').value = m.notes || '';
   document.querySelectorAll('.m_time').forEach(c => c.checked = m.times.includes(c.value));
   customMedTimes = (m.times || []).filter(t => !MED_PRESET_TIMES.includes(t));
+  timingDraft = {};
+  (m.times || []).forEach(t => {
+    const o = m.timingByTime && m.timingByTime[t];
+    if (o === '-') timingDraft[t] = '';
+    else if (o) timingDraft[t] = String(o);
+    else if (m.timing) timingDraft[t] = String(m.timing);
+  });
+  const l = lookOf(m);
+  lookDraft = l ? { shape: l.shape, size: l.size, colors: [...l.colors] } : { shape: '', size: '', colors: [] };
+  $('m_lookMark').value = l ? l.mark : '';
+  $('m_lookMarkText').value = l ? l.markText : '';
+  renderLookChips();
   renderCustomMedTimeChips();
   $('medFormSubmitBtn').textContent = 'บันทึกการแก้ไข';
   $('medFormCancelBtn').classList.remove('hidden');
@@ -4091,8 +4282,22 @@ $('medFormCancelBtn').addEventListener('click', resetMedForm);
 
 $('medForm').addEventListener('submit', e => {
   e.preventDefault();
-  const times = [...new Set([...document.querySelectorAll('.m_time:checked')].map(c => c.value).concat(customMedTimes))].sort();
+  const times = selectedMedTimes();
   if (!times.length){ showToast('กรุณาเลือกเวลา', 'เลือกเวลาทานยาอย่างน้อย 1 ช่วง', 'amber'); return; }
+  const timingByTime = {};
+  times.forEach(t => {
+    const sel = document.querySelector('.m_timingSel[data-t="' + t + '"]');
+    const v = sel ? sel.value : timingRowValue(t);
+    if (v) timingByTime[t] = v;
+    else if (t === '21:00') timingByTime[t] = '-'; // explicit "none" so 21:00 does not fall back to ก่อนนอน
+  });
+  const resolved = times.map(t => (timingByTime[t] && timingByTime[t] !== '-') ? timingByTime[t] : '');
+  const commonTiming = resolved.every(v => v && v === resolved[0]) ? resolved[0] : '';
+  const lookObj = {
+    shape: lookDraft.shape, size: lookDraft.size, colors: [...lookDraft.colors],
+    mark: $('m_lookMark').value, markText: $('m_lookMarkText').value.trim().slice(0, 30)
+  };
+  const hasLook = lookObj.shape || lookObj.size || lookObj.colors.length || lookObj.mark || lookObj.markText;
   const payload = {
     name: $('m_name').value.trim(),
     nickname: $('m_nickname').value.trim(),
@@ -4100,7 +4305,9 @@ $('medForm').addEventListener('submit', e => {
     startDate: $('m_startdate').value || '',
     quantity: $('m_quantity').value ? Number($('m_quantity').value) : '',
     pillsPerDose: $('m_pillsperdose').value ? Number($('m_pillsperdose').value) : 1,
-    timing: $('m_timing').value || '',
+    timing: commonTiming,
+    timingByTime,
+    look: hasLook ? lookObj : null,
     notes: $('m_notes').value.trim(),
     times
   };
@@ -4118,6 +4325,9 @@ $('medForm').addEventListener('submit', e => {
   renderHome();
   showToast(saved ? `${verb}ยาแล้ว` : 'บันทึกไม่สำเร็จ', saved ? `"${payload.name}" ${verb === 'เพิ่ม' ? 'ถูกเพิ่มในรายการเตือนแล้ว' : 'อัปเดตแล้ว'}` : 'ลอง Export ข้อมูลเก็บไว้ก่อน', saved ? 'teal' : 'red');
 });
+
+renderLookChips();
+renderTimingRows();
 
 function deleteMed(id){
   if (!confirm('ลบยานี้ออกจากรายการใช่หรือไม่?')) return;
@@ -4212,26 +4422,63 @@ function renderMedRefillBanner(){
   banner.innerHTML = html;
 }
 
+let medLookFilter = { shape: '', color: '' };
+
+function renderMedLookFilter(){
+  const box = $('medLookFilter');
+  if (!box) return;
+  const looks = meds.map(lookOf).filter(Boolean);
+  const shapes = LOOK_SHAPES.filter(v => looks.some(l => l.shape === v));
+  const colors = Object.keys(LOOK_COLORS).filter(v => looks.some(l => l.colors.includes(v)));
+  if (!shapes.length && !colors.length){ box.innerHTML = ''; return; }
+  const chip = (k, v, on, dot) => `<button type="button" class="mg-pick ${on ? 'on' : ''}" data-fk="${k}" data-v="${escapeHtml(v)}" aria-pressed="${on}">${dot ? `<span class="mg-dot" style="background:${dot}"></span>` : ''}${escapeHtml(v)}</button>`;
+  const active = medLookFilter.shape || medLookFilter.color;
+  box.innerHTML = `<p class="text-xs font-medium text-[var(--ink-soft)] mb-1">กรองตามลักษณะเม็ดยา</p>`
+    + (shapes.length ? `<div class="flex flex-wrap gap-1.5 mb-1.5">${shapes.map(v => chip('shape', v, medLookFilter.shape === v)).join('')}</div>` : '')
+    + (colors.length ? `<div class="flex flex-wrap gap-1.5">${colors.map(v => chip('color', v, medLookFilter.color === v, LOOK_COLORS[v])).join('')}</div>` : '')
+    + (active ? `<button type="button" class="mg-pick mt-1.5" data-clear="1">ล้างตัวกรอง</button>` : '');
+}
+$('medLookFilter').addEventListener('click', e => {
+  const b = e.target.closest('.mg-pick');
+  if (!b) return;
+  if (b.dataset.clear) medLookFilter = { shape: '', color: '' };
+  else { const k = b.dataset.fk; medLookFilter[k] = (medLookFilter[k] === b.dataset.v) ? '' : b.dataset.v; }
+  renderMeds();
+});
+
 function renderMeds(){
   const body = $('medListBody');
+  renderMedLookFilter();
   if (!meds.length){ body.innerHTML=''; $('medEmpty').classList.remove('hidden'); }
   else {
     $('medEmpty').classList.add('hidden');
     const today = todayStr();
     const allReversed = [...meds].reverse(); // most recently added first
-    const visible = sliceForDisplay(allReversed, 'meds');
+    const filtered = allReversed.filter(m => {
+      const l = lookOf(m);
+      if (medLookFilter.shape && !(l && l.shape === medLookFilter.shape)) return false;
+      if (medLookFilter.color && !(l && l.colors.includes(medLookFilter.color))) return false;
+      return true;
+    });
+    if (!filtered.length){
+      body.innerHTML = '<tr><td colspan="7" class="text-center text-[var(--ink-soft)] py-6 text-sm">ไม่พบยาที่ตรงกับลักษณะนี้ (ยาที่ยังไม่ได้กรอกลักษณะเม็ดจะไม่แสดงเมื่อใช้ตัวกรอง)</td></tr>';
+      renderMedTrackTab();
+      return;
+    }
+    const visible = sliceForDisplay(filtered, 'meds');
     body.innerHTML = visible.map(m => {
       const runOut = medRunOutDate(m);
       const daysLeft = runOut ? Math.ceil((new Date(runOut) - new Date(today)) / 86400000) : null;
       const runOutClass = daysLeft != null && daysLeft <= 3 ? 'text-red-600 font-semibold' : daysLeft != null && daysLeft <= 7 ? 'text-amber-600 font-semibold' : 'text-[var(--ink-soft)]';
+      const lookHtml = medLookHtml(m, true);
       return `
       <tr>
-        <td class="font-medium">${medDisplayName(m)}</td>
-        <td class="text-xs">${escapeHtml(m.dosage) || '-'}${m.timing ? `<br><span class="text-[var(--ink-soft)]">${escapeHtml(m.timing)}</span>` : ''}</td>
+        <td class="font-medium">${medDisplayName(m)}${lookHtml ? `<div>${lookHtml}</div>` : ''}</td>
+        <td class="text-xs">${escapeHtml(m.dosage) || '-'}<br><span class="text-[var(--ink-soft)]">ครั้งละ ${fmtPills(m.pillsPerDose)} เม็ด · วันละ ${m.times.length} ครั้ง</span></td>
         <td>
-          <div class="flex flex-wrap gap-1">${m.times.map(t => `<span class="text-[calc(0.625rem_*_var(--ts,1))] px-1.5 py-0.5 rounded-full bg-[var(--accent-light)] text-[var(--accent-dark)] font-medium num">${TIME_LABELS[t]||t}</span>`).join('')}</div>
+          <div class="flex flex-wrap gap-1">${m.times.map(t => `<span class="mg-timechip num">${escapeHtml(t)}${mealTagHtml(mealTagFor(m, t))}</span>`).join('')}</div>
         </td>
-        <td class="num text-xs">${m.quantity ? `${m.quantity} เม็ด` : '-'}${m.quantity ? `<br><span class="text-[var(--ink-soft)]">ครั้งละ ${m.pillsPerDose||1} เม็ด</span>` : ''}</td>
+        <td class="num text-xs">${m.quantity ? `${m.quantity} เม็ด` : '-'}</td>
         <td class="num text-xs">${m.startDate ? fmtDateThai(m.startDate) : '-'}</td>
         <td class="num text-xs ${runOutClass}">${runOut ? `${fmtDateThai(runOut)}${daysLeft!=null?`<br>(อีก ${daysLeft} วัน)`:''}` : '-'}</td>
         <td class="whitespace-nowrap">
@@ -4239,7 +4486,7 @@ function renderMeds(){
           <button onclick="deleteMed(${m.id})" class="text-red-400 hover:text-red-600 px-1" title="ลบ">🗑</button>
         </td>
       </tr>${m.notes ? `<tr class="border-b border-slate-50"><td colspan="7" class="pb-2.5 pr-3 text-xs text-[var(--ink-soft)]">⚠️ ${escapeHtml(m.notes)}</td></tr>` : ''}`;
-    }).join('') + showMoreRowHtml('meds', allReversed.length, 7);
+    }).join('') + showMoreRowHtml('meds', filtered.length, 7);
   }
   renderMedTrackTab();
 }
@@ -4248,7 +4495,7 @@ function renderMedTrackTab(){
   const day = todayStr();
   medTrack[day] = medTrack[day] || {};
   let rows = [];
-  meds.forEach(m => m.times.forEach(t => rows.push({ key:m.id+'_'+t, nameHtml: medDisplayName(m), time:t, checked: !!medTrack[day][m.id+'_'+t] })));
+  meds.forEach(m => m.times.forEach(t => rows.push({ key:m.id+'_'+t, nameHtml: medDisplayName(m), time:t, tag: mealTagFor(m, t), checked: !!medTrack[day][m.id+'_'+t] })));
   rows.sort((a,b) => a.time.localeCompare(b.time));
 
   const wrap = $('medTrackWrap');
@@ -4256,7 +4503,7 @@ function renderMedTrackTab(){
   $('medTrackEmpty').classList.add('hidden');
   wrap.innerHTML = rows.map(r => `
     <tr class="${r.checked?'opacity-50':''}">
-      <td class="num font-medium whitespace-nowrap">${TIME_LABELS[r.time] ? TIME_LABELS[r.time] + ' ' : ''}<span class="${TIME_LABELS[r.time] ? 'text-[var(--ink-soft)] font-normal' : ''}">${r.time}</span></td>
+      <td class="num font-medium whitespace-nowrap">${escapeHtml(r.time)}${mealTagHtml(r.tag)}</td>
       <td class="${r.checked?'line-through':''}">${r.nameHtml}</td>
       <td><input type="checkbox" class="track-check h-4 w-4" data-key="${r.key}" ${r.checked?'checked':''}></td>
     </tr>`).join('');
@@ -4290,7 +4537,11 @@ function buildPushSyncPayload(){
       id: m.id,
       times: m.times,
       label: medDisplayNamePlain(m),
-      detail: [m.dosage, m.notes].filter(Boolean).join(' · ')
+      // v27: compact push text built from these (notes/warnings are no longer sent to the server)
+      v: 2,
+      dose: medDoseLabel(m),
+      look: medLookLabel(m),
+      tags: medTagsByTime(m)
     })),
     appts: appts.map(a => ({
       id: a.id,
@@ -4458,9 +4709,10 @@ function checkMedReminders(){
       fired[day][key] = true;
       changed = true;
       const label = t === hhmm ? '⏰ ถึงเวลาทานยา' : `⏰ ถึงเวลาทานยา (${t} น.)`;
-      showToast(label, `${medDisplayNamePlain(m)} ${m.dosage||''} ${m.notes?'· '+m.notes:''}`.trim(), 'amber');
+      showToast(label, `${medDisplayNamePlain(m)} · ${medReminderBody(m, t)}`, 'amber');
       // v25: medicine name first so the lock screen (which truncates the title) shows it.
-      fireNotification('💊 ' + medDisplayNamePlain(m), `ถึงเวลาทานยา ${t} น.${(m.dosage||m.notes)?' · ':''}${`${m.dosage||''} ${m.notes?'· '+m.notes:''}`.trim()}`);
+      // v27: short body — time (meal tag), dose with tablet count, pill appearance.
+      fireNotification('💊 ' + medDisplayNamePlain(m), medReminderBody(m, t));
     });
   });
   if (changed) saveAll();
